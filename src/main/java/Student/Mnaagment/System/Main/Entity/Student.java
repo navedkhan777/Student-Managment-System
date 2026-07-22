@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 
 
 @Entity
@@ -15,8 +16,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Student {
+public class Student implements Serializable{
 
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

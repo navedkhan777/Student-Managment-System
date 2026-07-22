@@ -7,6 +7,9 @@ import Student.Mnaagment.System.Main.repository.StudentRepo;
 import ch.qos.logback.classic.boolex.StubEventEvaluator;
 import org.hibernate.service.spi.InjectService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,15 +32,18 @@ public class StudentService {
         return studentRepo.save(student);
     }
 
+
     public Page<Student> getAllStudent(int page , int size, String sortBy){
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
         return studentRepo.findAll(pageable);
     }
 
+    @Cacheable(value = "students", key = "#id")
     public Student getStudentById(Long id){
         return studentRepo.findById(id).orElseThrow(() -> new StudentNotFoundException("Student not found with id : " + id));
     }
 
+    @CachePut(value = "students", key = "id")
     public Student updateStudent(Long id, Student updateStudent){
         Student student = studentRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
@@ -48,6 +54,7 @@ public class StudentService {
         return studentRepo.save(student);
     }
 
+    @CacheEvict(value = "students", key = "#id")
     public String deleteStudent(Long id){
         studentRepo.findById(id).orElseThrow(() -> new RuntimeException("Student Not found"));
         studentRepo.deleteById(id);
