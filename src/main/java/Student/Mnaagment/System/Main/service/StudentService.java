@@ -14,16 +14,40 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class StudentService {
 
     @Autowired
     private StudentRepo studentRepo;
+
+    @Autowired
+     private RedisTemplate<String, Object> redisTemplate;
+
+
+    public void saveName(){
+        redisTemplate.opsForValue().set("name", "Naved");
+    }
+
+    public String getName(){
+        redisTemplate.opsForValue().get("name");
+    }
+
+    public void saveOtp(){
+        redisTemplate
+                .opsForValue()
+                .set("otp", "123456", 60, TimeUnit.SECONDS);
+    }
+
+    public boolean deleteName(){
+        return Boolean.TRUE.equals(redisTemplate.delete("name"));
+    }
 
     public Student addStudent(Student student){
         if(studentRepo.existsByEmail(student.getEmail())){
